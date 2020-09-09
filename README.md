@@ -70,6 +70,10 @@ This device is not immediately recognized by pyvisa when following the
 instructions at 
 https://dl.cdn-anritsu.com/en-us/test-measurement/files/Manuals/Programming-Manual/10410-00746V.pdf#page=36
 
+#### Units
+The instrument driver outputs the appropriate units. They are plotted onto the 
+graph labels by `plot_by_id`. 
+
 # Installing git on windows
 This code will be managed inside a git repository. In Windows 10, installing 
 git is very easy (https://git-scm.com/download/win). This will install a 

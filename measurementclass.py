@@ -60,7 +60,7 @@ class MeasurementClass:
         self.sample_name = 'no_sample'
         
         # -- set experiment parameters (global constants, used in different measurement functions)
-        self.numberofpoints = 2001  # number of measurement points
+        self.numberofpoints = 20 # 2001  # number of measurement points
         self.vnapower = -10  # applied power
         self.start_frequency = 3.7e9  #3.387015e9 #6.608e9-3.5e6  # start frequency of sweep
         self.stop_frequency = 5.7e9  #3.387065e9 #6.611e9 +3.5e6  # stop frequency of sweep
@@ -168,7 +168,7 @@ class MeasurementClass:
         # datasaver object has been declared in the head of the with block
         # but is still accessible here
         x = datasaver.dataset.get_parameter_data()
-        export = np.zeros((numberofpoints, 5))
+        self.export = np.zeros((numberofpoints, 5))
         
         # in the anritsu vna, there are several S21 vs freq graph windows (tr1 and tr2)
         # here, presumably, only tr1 is listened to
@@ -176,29 +176,29 @@ class MeasurementClass:
         # the database keys (below) can be explored by e.g. 
         # just printing the dictionary on the jupyter console
         # these key names are generated in the Anritsu's driver's `traces` function
-        export[:,0] = list(x['VNA_tr1_magnitude']['VNA_tr1_frequency'])
-        export[:,1] = list(x['VNA_tr1_magnitude']['VNA_tr1_magnitude'])
-        export[:,2] = list(x['VNA_tr1_phase']['VNA_tr1_phase'])
-        export[:,3] = list(x['VNA_tr1_real']['VNA_tr1_real'])
-        export[:,4] = list(x['VNA_tr1_imaginary']['VNA_tr1_imaginary'])
+        self.export[:,0] = list(x['VNA_tr1_magnitude']['VNA_tr1_frequency'])
+        self.export[:,1] = list(x['VNA_tr1_magnitude']['VNA_tr1_magnitude'])
+        self.export[:,2] = list(x['VNA_tr1_phase']['VNA_tr1_phase'])
+        self.export[:,3] = list(x['VNA_tr1_real']['VNA_tr1_real'])
+        self.export[:,4] = list(x['VNA_tr1_imaginary']['VNA_tr1_imaginary'])
         
         np.savetxt(
             os.path.join(self.raw_path_with_date,
                                 str(datasaver.run_id) + '_nosweep' + '_' + str(self.exp_name) + '.txt'), 
-            export)  # "folder%i.txt"%+(int(number)+1)
+            self.export)  # "folder%i.txt"%+(int(number)+1)
         
         # -- plotting -> qcodes' plotting routine + matplotlib
         plot_by_id(datasaver.run_id)  # qcodes can plot the datasaver data
         
         plt.cla()
-        plt.plot(export[:,0], export[:,1])
+        plt.plot(self.export[:,0], self.export[:,1])
         plt.xlabel('Frequency (Hz)')
         plt.ylabel('Magnitude (dB)')
         plt.savefig(os.path.join(self.raw_path_with_date, 
                                  str(datasaver.run_id) + '_nosweep' + '_' + str(self.exp_name) + '_ampl.png'))
         plt.cla()
         
-        plt.plot(export[:,0], export[:,2])
+        plt.plot(self.export[:,0], self.export[:,2])
         plt.xlabel('Frequency (Hz)')
         plt.ylabel('Phase (deg)')
         plt.savefig(os.path.join(self.raw_path_with_date, 
@@ -262,25 +262,26 @@ class MeasurementClass:
         x = datasaver.dataset.get_parameter_data()
         
         #print(x)
-        export = np.zeros((self.numberofpoints, 5))
-        export[:,0]=list(x['VNA_tr1_magnitude']['VNA_tr1_frequency'])
-        export[:,1]=list(x['VNA_tr1_magnitude']['VNA_tr1_magnitude'])
-        export[:,2]=list(x['VNA_tr1_phase']['VNA_tr1_phase'])
-        export[:,3]=list(x['VNA_tr1_real']['VNA_tr1_real'])
-        export[:,4]=list(x['VNA_tr1_imaginary']['VNA_tr1_imaginary'])
+        self.export = np.zeros((self.numberofpoints, 5))
+        self.export[:,0]=list(x['VNA_tr1_magnitude']['VNA_tr1_frequency'])
+        self.export[:,1]=list(x['VNA_tr1_magnitude']['VNA_tr1_magnitude'])
+        self.export[:,2]=list(x['VNA_tr1_phase']['VNA_tr1_phase'])
+        self.export[:,3]=list(x['VNA_tr1_real']['VNA_tr1_real'])
+        self.export[:,4]=list(x['VNA_tr1_imaginary']['VNA_tr1_imaginary'])
         
         sweeppower = int(self.vna.power.get())
         
-        np.savetxt(str(datasaver.run_id) + '_sweep' + '_' + 
-                   str(self.exp_name) + '_' + (sweeppower) + 
-                   'dB' + '.txt', export)
+        np.savetxt(os.path.join(self.raw_path_with_date, 
+                                (str(datasaver.run_id) + '_sweep' + '_' + 
+                                 str(self.exp_name) + '_' + str(sweeppower) + 
+                                 'dB' + '.txt')), self.export)
         
         plot_by_id(datasaver.run_id)  # qcodes
         
         self.vna.sweep_mode.set('CONT')  # why setting it here again?
         
         plt.cla()
-        plt.plot(export[:,0], export[:,1])
+        plt.plot(self.export[:,0], self.export[:,1])
         plt.xlabel('Frequency (Hz)')
         plt.ylabel('Magnitude (dB)')
         plt.savefig(os.path.join(self.raw_path_with_date,
@@ -288,7 +289,7 @@ class MeasurementClass:
                      str(self.exp_name) + '_ampl.png'))
         plt.cla()
         
-        plt.plot(export[:,0], export[:,2])
+        plt.plot(self.export[:,0], self.export[:,2])
         plt.xlabel('Frequency (Hz)')
         plt.ylabel('Phase (deg)')
         plt.savefig(os.path.join(self.raw_path_with_date,
@@ -369,37 +370,37 @@ class MeasurementClass:
             
         x = datasaver.dataset.get_parameter_data()
             
-        export = np.zeros(((self.numberofpoints)*(self.powersweepnum), 6))
-        export[:,0] = list(x['VNA_tr1_magnitude']['VNA_tr1_frequency'])
-        export[:,1] = list(x['VNA_tr1_magnitude']['VNA_tr1_magnitude'])
-        export[:,2] = list(x['VNA_tr1_phase']['VNA_tr1_phase'])
-        export[:,3] = list(x['VNA_tr1_real']['VNA_tr1_real'])
-        export[:,4] = list(x['VNA_tr1_imaginary']['VNA_tr1_imaginary'])
-        export[:,5] = list(x['VNA_tr1_imaginary']['VNA_power'])
+        self.export = np.zeros(((self.numberofpoints)*(self.powersweepnum), 6))
+        self.export[:,0] = list(x['VNA_tr1_magnitude']['VNA_tr1_frequency'])
+        self.export[:,1] = list(x['VNA_tr1_magnitude']['VNA_tr1_magnitude'])
+        self.export[:,2] = list(x['VNA_tr1_phase']['VNA_tr1_phase'])
+        self.export[:,3] = list(x['VNA_tr1_real']['VNA_tr1_real'])
+        self.export[:,4] = list(x['VNA_tr1_imaginary']['VNA_tr1_imaginary'])
+        self.export[:,5] = list(x['VNA_tr1_imaginary']['VNA_power'])
         
         table_ampl = np.zeros((self.numberofpoints + 1, self.powersweepnum+1))
         table_phase = np.zeros((self.numberofpoints + 1, self.powersweepnum+1))
-        table_ampl[1:(self.numberofpoints + 1), 0] = export[0:(self.numberofpoints), 0]
-        table_ampl[0, 1:(self.powersweepnum + 1)] = export[0:(len(export[:,0]) - 1):self.numberofpoints, 5]
-        table_phase[1:(self.numberofpoints + 1), 0] = export[0:(self.numberofpoints), 0]
-        table_phase[0, 1:(self.powersweepnum + 1)] = export[0:(len(export[:,0]) - 1):self.numberofpoints, 5]
+        table_ampl[1:(self.numberofpoints + 1), 0] = self.export[0:(self.numberofpoints), 0]
+        table_ampl[0, 1:(self.powersweepnum + 1)] = self.export[0:(len(self.export[:,0]) - 1):self.numberofpoints, 5]
+        table_phase[1:(self.numberofpoints + 1), 0] = self.export[0:(self.numberofpoints), 0]
+        table_phase[0, 1:(self.powersweepnum + 1)] = self.export[0:(len(self.export[:,0]) - 1):self.numberofpoints, 5]
         
         for i in range(self.powersweepnum):
-            table_ampl[1:(self.numberofpoints + 1), i + 1] = export[(self.numberofpoints*i):(self.numberofpoints*(i + 1)), 1]
+            table_ampl[1:(self.numberofpoints + 1), i + 1] = self.export[(self.numberofpoints*i):(self.numberofpoints*(i + 1)), 1]
             ampl = table_ampl[1:(self.numberofpoints + 1), i + 1]
-            table_phase[1:(self.numberofpoints + 1), i + 1] = export[(self.numberofpoints*i):(self.numberofpoints*(i + 1)), 2]
+            table_phase[1:(self.numberofpoints + 1), i + 1] = self.export[(self.numberofpoints*i):(self.numberofpoints*(i + 1)), 2]
             phase=table_phase[1:(self.numberofpoints + 1), i + 1]
             
         np.savetxt(os.path.join(self.raw_path_with_date,
                      str(datasaver.run_id) + '_powersweep' + '_' + 
-                     str(self.exp_name) + '_phase.txt'))
+                     str(self.exp_name) + '_phase.txt'), self.export)
         
-        print(len(export[:, 0]))
-        #print(export)
+        print(len(self.export[:, 0]))
+        #print(self.export)
         
         np.savetxt(os.path.join(self.raw_path_with_date,
                      str(datasaver.run_id) + '_powersweep' + '_' + 
-                     str(self.exp_name) + '_all.txt'), export)
+                     str(self.exp_name) + '_all.txt'), self.export)
         
         
         plot_by_id(datasaver.run_id)
