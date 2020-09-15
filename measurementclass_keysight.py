@@ -10,7 +10,8 @@ Procedure:
         - capture the data which is displayed on the Anritsu's screen
 """
 
-import qcodes.instrument_drivers.Anritsu_test.MS46522B as VNA
+from Keysight_P9373A import Keysight_P9373A
+
 import qcodes as qc
 import os
 from datetime import date
@@ -24,7 +25,7 @@ from qcodes.dataset.plotting import plot_by_id
 from qcodes.dataset.experiment_container import load_experiment_by_name, new_experiment  #, experiments, load_experiment
 import matplotlib.pyplot as plt
 import numpy as np
-import pyvisa  # package which allows to control masurement devices independent of interface (USB, Ethernet, ...)
+# import pyvisa  # package which allows to control masurement devices independent of interface (USB, Ethernet, ...)
 
 import logging  # general logging package
 logger = logging.getLogger()
@@ -42,8 +43,10 @@ class MeasurementClass:
             2. specify experimental parameters 
             3. specify paths of the target files: 
                database file and a new folder with raw (txt, png) files """
+        
         self.vna_name = 'VNA'
-        self.vna_class = VNA.VNABase  # this is a qcodes VisaInstrument (interface between visa and qcodes)
+        self.vna_class = Keysight_P9373A  # this is a qcodes VisaInstrument (interface between visa and qcodes)
+        self.vna_address = "TCPIP0::maip-franck::hislip0,4880::INSTR"
         
         # -- check if instrument 'VNA' already exists. If not, create it
         if Instrument.exist(self.vna_name, self.vna_class): 
@@ -51,12 +54,12 @@ class MeasurementClass:
             # from which it can be retrieved manually using find_instrument
             self.vna = Instrument.find_instrument(self.vna_name, self.vna_class)
         else:
-            self.vna = VNA.VNABase(self.vna_name, 'TCPIP0::169.254.235.118::5001::SOCKET', 
-                                   50e6, 20e9, -30, 30, 2)
+            self.vna = self.vna_class(self.vna_name, self.vna_address, 
+                                      50e6, 20e9, -30, 30, 2)
         
         # -- name the experiment -> automatic file names
-        self.exp_name = 'Warm_VNA_Noise'  # name used by qcodes
-        self.cooldown_date = '20-09-08'
+        self.exp_name = 'Keysight_Noise'  # name used by qcodes
+        self.cooldown_date = '15-09-08'
         self.sample_name = 'no_sample'
         
         # -- set experiment parameters (global constants, used in different measurement functions)
@@ -415,8 +418,8 @@ class MeasurementClass:
         #plt.savefig('fig.png',fig)
     
 
-#  if __name__ == '__main__':
-#      m = MeasurementClass()
-#      m.record_vna_screen()
+if __name__ == '__main__':
+    m = MeasurementClass()
+    m.record_vna_screen()
     
     
