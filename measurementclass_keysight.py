@@ -50,12 +50,16 @@ class MeasurementClass:
         self.vna_address = "TCPIP0::maip-franck::hislip0,4880::INSTR"
         
         # -- check if instrument 'VNA' already exists. If not, create it
+<<<<<<< HEAD
         
         import ipdb; ipdb.set_trace()
+=======
+>>>>>>> 9c9df15e14a2484b901a3ac25762f6c525f482dc
         if Instrument.exist(self.vna_name, self.vna_class): 
             # an instrument is created by qcodes in a global context, 
             # from which it can be retrieved manually using find_instrument
             self.vna = Instrument.find_instrument(self.vna_name, self.vna_class)
+<<<<<<< HEAD
             
         else:
             if self.vna_class = Keysight_P9373A
@@ -65,6 +69,15 @@ class MeasurementClass:
         # -- name the experiment -> automatic file names
         self.exp_name = 'Keysight_Noise'  # name used by qcodes
         self.cooldown_date = '17-09-08'
+=======
+        else:
+            self.vna = self.vna_class(self.vna_name, self.vna_address, 
+                                      50e6, 20e9, -30, 30, 2)
+        
+        # -- name the experiment -> automatic file names
+        self.exp_name = 'Keysight_Noise'  # name used by qcodes
+        self.cooldown_date = '15-09-08'
+>>>>>>> 9c9df15e14a2484b901a3ac25762f6c525f482dc
         self.sample_name = 'no_sample'
         
         # -- set experiment parameters (global constants, used in different measurement functions)
@@ -85,12 +98,17 @@ class MeasurementClass:
         
         
         # -- set the path where the raw data should be saved to (pngs, txts)
+<<<<<<< HEAD
         self.raw_path = ('C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements\\chris\\keysight_tests_data' + 
+=======
+        self.raw_path = ('C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements\\Data' + 
+>>>>>>> 9c9df15e14a2484b901a3ac25762f6c525f482dc
                          '\\' + self.cooldown_date + '_' + self.sample_name + '\\'
                          'raw')
         
         # set the .db path
         qc.config["core"]["db_location"] = (
+<<<<<<< HEAD
                 os.path.join('C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements\\chris\\keysight_tests_data',
                              'keysight_tests.db'))
         
@@ -98,6 +116,14 @@ class MeasurementClass:
         qc.config.save_config(
                 os.path.join("C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements\\chris\\keysight_tests_data", 
                              ".qcodesrc"))
+=======
+                os.path.join('C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements\\Data',
+                             'experiments.db'))
+        
+        # store a qcodesrc file with the loaded .db path to the measurements folder
+        qc.config.save_config(
+                os.path.join("C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements", ".qcodesrc"))
+>>>>>>> 9c9df15e14a2484b901a3ac25762f6c525f482dc
         
         # -- check if in the standard folder -see qcodes config file- an experiment with exp_name already exists
         #    if not, create a new folder at path
@@ -125,6 +151,7 @@ class MeasurementClass:
         
         # # change working directory to be inside the 
         # os.chdir(raw_path_with_date)
+<<<<<<< HEAD
         
         
         # m.record_vna_screen()
@@ -135,6 +162,14 @@ class MeasurementClass:
         # control the vna from inside qcodes -> set a parameter
         
         # self.vna.active_trace.set(False)  # doesn't work for the keysight
+=======
+
+    def record_vna_screen(self):
+        numberofpoints = self.vna.points.get()  # get current number of points from VNA settings
+        
+        # control the vna from inside qcodes -> set a parameter
+        self.vna.active_trace.set(False)  # ? is the trace just the screen shown in the ShockLine program?
+>>>>>>> 9c9df15e14a2484b901a3ac25762f6c525f482dc
         
         # -- Get the measurable values from the intrument, through the driver/Qcodes interface, 
         #    which provides access to current parameter and measurement values through methods
@@ -144,6 +179,7 @@ class MeasurementClass:
         
         # if S21 is a complex number (? it must be calculated from something real which is actually measured)
         # get it's data (? whole array that is showing at runtime in the window, or last complete sweep (buffered))
+<<<<<<< HEAD
         # meas.register_parameter(self.vna.real)
         # meas.register_parameter(self.vna.imaginary)
         
@@ -157,10 +193,20 @@ class MeasurementClass:
         meas.register_parameter(self.vna.real)
         meas.register_parameter(self.vna.imaginary)
         
+=======
+        meas.register_parameter(self.vna.real)
+        meas.register_parameter(self.vna.imaginary)
+        
+        # ? aren't these redundant and are just calculated from real and imaginary parts?
+        meas.register_parameter(self.vna.magnitude)
+        meas.register_parameter(self.vna.phase)
+        
+>>>>>>> 9c9df15e14a2484b901a3ac25762f6c525f482dc
         # actually get the data
         
         print("before taking data")
         with meas.run() as datasaver:  # try to run the measurement (? but this doesn't yet write to the database)
+<<<<<<< HEAD
             # self.vna.active_trace.set(1)  # there are Tr1 and Tr2
             self.vna.traces.tr1.run_sweep()
             
@@ -169,12 +215,18 @@ class MeasurementClass:
             
             # phase = self.vna.phase()
             
+=======
+            self.vna.active_trace.set(1)  # there are Tr1 and Tr2
+            # vna.traces.tr1.run_sweep()
+            imag = self.vna.imaginary()
+>>>>>>> 9c9df15e14a2484b901a3ac25762f6c525f482dc
             # vna.active_trace.set(2)
             # vna.traces.tr2.run_sweep()
             
             # call the vna driver's methods to get measurement values
             # parameters, after saving them in a 'runner' (returned from run()), have unique names
             # which can be explored by printing the keys of the runner's dataset (get_parameter_data(...))
+<<<<<<< HEAD
             
             # real = self.vna.real()
             # mag = self.vna.magnitude()
@@ -182,6 +234,15 @@ class MeasurementClass:
             # pass pairs of (function, acquired value) to the datasaver (for later saving into the database)
             datasaver.add_result(  # (self.vna.magnitude, mag), 
                                    # (self.vna.phase, phase), 
+=======
+            phase = self.vna.phase()
+            real = self.vna.real()
+            mag = self.vna.magnitude()
+            
+            # pass pairs of (function, acquired value) to the datasaver (for later saving into the database)
+            datasaver.add_result((self.vna.magnitude, mag), 
+                                 (self.vna.phase, phase), 
+>>>>>>> 9c9df15e14a2484b901a3ac25762f6c525f482dc
                                  (self.vna.real, real),
                                  (self.vna.imaginary, imag))
             # dataid1 = datasaver.run_id
@@ -191,8 +252,13 @@ class MeasurementClass:
         # -- extract data from datasaver
         # datasaver object has been declared in the head of the with block
         # but is still accessible here
+<<<<<<< HEAD
         self.set_of_parameter_data = datasaver.dataset.get_parameter_data()
         # self.export = np.zeros((numberofpoints, 5))
+=======
+        x = datasaver.dataset.get_parameter_data()
+        self.export = np.zeros((numberofpoints, 5))
+>>>>>>> 9c9df15e14a2484b901a3ac25762f6c525f482dc
         
         # in the anritsu vna, there are several S21 vs freq graph windows (tr1 and tr2)
         # here, presumably, only tr1 is listened to
@@ -200,6 +266,7 @@ class MeasurementClass:
         # the database keys (below) can be explored by e.g. 
         # just printing the dictionary on the jupyter console
         # these key names are generated in the Anritsu's driver's `traces` function
+<<<<<<< HEAD
         # self.export[:,0] = list(x['VNA_tr1_magnitude']['VNA_tr1_frequency'])
         # self.export[:,1] = list(x['VNA_tr1_magnitude']['VNA_tr1_magnitude'])
         
@@ -214,10 +281,23 @@ class MeasurementClass:
 #            os.path.join(self.raw_path_with_date,
 #                                str(datasaver.run_id) + '_nosweep' + '_' + str(self.exp_name) + '.txt'), 
 #            self.export)  # "folder%i.txt"%+(int(number)+1)
+=======
+        self.export[:,0] = list(x['VNA_tr1_magnitude']['VNA_tr1_frequency'])
+        self.export[:,1] = list(x['VNA_tr1_magnitude']['VNA_tr1_magnitude'])
+        self.export[:,2] = list(x['VNA_tr1_phase']['VNA_tr1_phase'])
+        self.export[:,3] = list(x['VNA_tr1_real']['VNA_tr1_real'])
+        self.export[:,4] = list(x['VNA_tr1_imaginary']['VNA_tr1_imaginary'])
+        
+        np.savetxt(
+            os.path.join(self.raw_path_with_date,
+                                str(datasaver.run_id) + '_nosweep' + '_' + str(self.exp_name) + '.txt'), 
+            self.export)  # "folder%i.txt"%+(int(number)+1)
+>>>>>>> 9c9df15e14a2484b901a3ac25762f6c525f482dc
         
         # -- plotting -> qcodes' plotting routine + matplotlib
         plot_by_id(datasaver.run_id)  # qcodes can plot the datasaver data
         
+<<<<<<< HEAD
 #        plt.cla()
 #        plt.plot(self.export[:,0], self.export[:,1])
 #        plt.xlabel('Frequency (Hz)')
@@ -233,6 +313,23 @@ class MeasurementClass:
 #                                 str(datasaver.run_id) + '_nosweep' + '_' + str(self.exp_name) + '_phase.png'))
         
 #        print("txt and plots written to", self.raw_path_with_date)
+=======
+        plt.cla()
+        plt.plot(self.export[:,0], self.export[:,1])
+        plt.xlabel('Frequency (Hz)')
+        plt.ylabel('Magnitude (dB)')
+        plt.savefig(os.path.join(self.raw_path_with_date, 
+                                 str(datasaver.run_id) + '_nosweep' + '_' + str(self.exp_name) + '_ampl.png'))
+        plt.cla()
+        
+        plt.plot(self.export[:,0], self.export[:,2])
+        plt.xlabel('Frequency (Hz)')
+        plt.ylabel('Phase (deg)')
+        plt.savefig(os.path.join(self.raw_path_with_date, 
+                                 str(datasaver.run_id) + '_nosweep' + '_' + str(self.exp_name) + '_phase.png'))
+        
+        print("txt and plots written to", self.raw_path_with_date)
+>>>>>>> 9c9df15e14a2484b901a3ac25762f6c525f482dc
         
     
     def measure_frequency_sweep(self
@@ -442,4 +539,12 @@ class MeasurementClass:
         #plt.show()
         #plt.savefig('fig.png',fig)
     
+<<<<<<< HEAD
+=======
+
+if __name__ == '__main__':
+    m = MeasurementClass()
+    m.record_vna_screen()
+    
+>>>>>>> 9c9df15e14a2484b901a3ac25762f6c525f482dc
     

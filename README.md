@@ -61,7 +61,6 @@ From that point on, one can actually use the usual ipdb commands in the console 
 (like n for next line, s for step into and c for continue). 
 That way, Spyder will even highlight the current line that is being debugged, in it's editor window.
 
-
 ## installing qcodes
 Make sure Anaconda is installed (https://docs.anaconda.com/anaconda/install/). 
 Setup a conda environment tuned for qcodes: follow the `Installing QCoDeS from GitHub` section 
@@ -209,9 +208,5 @@ ing hlab
   ./plotting
   - adding capabilities to take horizontal and vertical cut out of 2d data
   
-  
 ## conda_envs
 To roll back to working conda environments, yml files are stored here. 
-
-  
-
