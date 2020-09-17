@@ -62,9 +62,11 @@ From that point on, one can actually use the usual ipdb commands in the console 
 That way, Spyder will even highlight the current line that is being debugged, in it's editor window.
 
 ## installing qcodes
-Make sure Anaconda is installed (https://docs.anaconda.com/anaconda/install/). 
+Make sure Anaconda is installed (https://docs.anaconda.com/anaconda/install/) and up-to-date. 
 Setup a conda environment tuned for qcodes: follow the `Installing QCoDeS from GitHub` section 
 (https://qcodes.github.io/Qcodes/start/index.html#installing-qcodes-from-github).
+Make sure you install the correct python version (the lastest github release is probably behind 
+the latest python, look it up in qcodes' yml file). 
 The qcodes drivers often have pyvisa (https://github.com/pyvisa/pyvisa) as a dependency. 
 pyvisa depends again on a backend like pyvisa-py (https://github.com/pyvisa/pyvisa-py) or 
 specific proprietary software from NI, Keysight, etc..
@@ -210,3 +212,8 @@ ing hlab
   
 ## conda_envs
 To roll back to working conda environments, yml files are stored here. 
+
+
+
+# reason for updating anaconda
+hlab has some functions which need a newer python version than our current qcodes/python setup. 

@@ -16,7 +16,7 @@ from datetime import date
 import logging
 from qcodes.dataset.measurements import Measurement, DataSaver
 from qcodes.dataset.plotting import plot_by_id
-from qcodes.dataset.database import initialise_database
+# from qcodes.dataset.database import initialise_database
 from qcodes.dataset.data_set import new_data_set, ParamSpec, DataSet, load_by_id 
 from qcodes.dataset.data_export import get_data_by_id
 #from qcodes.dataset.data_set.DataSet import get_parameter_data
@@ -29,6 +29,8 @@ import pyvisa
 vna_name = "VNA"
 vna_class = Keysight_P9373A  # this is a qcodes VisaInstrument (interface between visa and qcodes)
 vna_address = "TCPIP0::maip-franck::hislip0,4880::INSTR"
+
+vna = None
 
 if Instrument.exist(vna_name, vna_class): 
     # an instrument is created by qcodes in a global context, 

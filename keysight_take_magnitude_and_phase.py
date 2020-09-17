@@ -19,7 +19,7 @@ from datetime import date
 import logging
 from qcodes.dataset.measurements import Measurement, DataSaver
 from qcodes.dataset.plotting import plot_by_id
-from qcodes.dataset.database import initialise_database
+# from qcodes.dataset.database import initialise_database
 from qcodes.dataset.data_set import new_data_set, ParamSpec, DataSet, load_by_id 
 from qcodes.dataset.data_export import get_data_by_id
 #from qcodes.dataset.data_set.DataSet import get_parameter_data
@@ -38,9 +38,6 @@ import pyvisa
 #vna.averages_enabled(True)
 #vna.averages(2)
 
-#meas = Measurement()
-#meas.register_parameter(vna.magnitude)
-#meas.register_parameter(vna.phase)
 #
 #with meas.run() as datasaver:
 #    vna.traces.tr1.run_sweep() # Ask the PNA to take a measurement
@@ -50,6 +47,10 @@ import pyvisa
 #                         (vna.phase, phase))
 #    dataid = datasaver.run_id
 #plot_by_id(dataid)
+
+meas = Measurement()
+meas.register_parameter(vna.magnitude)
+meas.register_parameter(vna.phase)
 
 with meas.run() as datasaver:
     vna.traces.tr1.run_sweep() # Ask the PNA to take a measurement
