@@ -7,6 +7,27 @@ Created on Wed Sep 16 14:51:48 2020
 
 import global_definitions
 
+
+def qcodes_config_set_test_database(): 
+    # set the .db path
+    qc.config["core"]["db_location"] = (
+            os.path.join('C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements\\chris\\keysight_tests_data',
+                         'keysight_tests.db'))
+    
+    
+def qcodes_config_set_measurement_database(): 
+    # set the .db path
+    qc.config["core"]["db_location"] = (
+            os.path.join("C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements\\Data\\", 
+                         "experiments.db"))
+    
+    # store a qcodesrc file with the loaded .db path to the measurements folder
+    # qc.config.save_config(
+    #     os.path.join("C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements\\chris\\keysight_tests_data", 
+    #                  ".qcodesrc"))
+    
+
+
 # -- there is a json file with a list of known instruments and their addresses
 import json
 
