@@ -17,7 +17,7 @@ conda env list
 in the Anaconda Prompt (not the standard `cmd.exe`). 
 This will also show the currently active conda virtual environment of the opened Anaconda Prompt (marked by *). 
 
-## installing spyder 
+### using Spyder
 Spyder needs to be installed with the command
 ```
 conda install -c anaconda spyder
@@ -30,7 +30,43 @@ resulted in an installation where
 - `where spyder` didn't show the spyder package in the conda environment
 - spyder didn't access the python command of it's environment 
 
-## opening up a new instance of spyder with a new indepdentent ipython kernel
+#### difference between spyder 3 and 4
+In spyder 3, in file `fa.py` one could write:
+
+```
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Sep 18 14:13:00 2020
+
+@author: nanospin
+"""
+a = 1
+```
+
+run this using `runfile(...)` (play button in spyder 3)
+and when running another file `fb.py`, 
+
+```
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Sep 18 14:21:10 2020
+
+@author: nanospin
+"""
+
+print(a)
+```
+
+it would actually print on the value of `a` (in the jupyter console). 
+However, in Spyder 4 (with more recent python version), running 
+`fb.py` with `runfile` will produce a `NameError: name 'a' is not defined`. 
+Running `print(a)` interactively in the jupyter console still works, if 
+`a` has been defined in a file ran before. 
+This behaviour could suggest that it is in general not good style to 
+write a file like the above `fb.py`, in which something is accessed 
+without it having been imported or defined at the top of the file. 
+
+#### opening up a new instance of spyder with a new indepdentent ipython kernel
 Go to a cmd, activate the desired conda virtual environment, then run
 ```
 where spyder
@@ -73,6 +109,17 @@ specific proprietary software from NI, Keysight, etc..
 (? This package can only be download by national instruments with registering, but for free. 
 Copy the downloaded pyvisa module as pyvisa-py in C:\Users\nanospin\AppData\Local\Continuum\anaconda3\envs\qcodes\Lib\site-packages)
 
+- install pyvisa: 
+```
+pip install pyvisa
+```
+
+- install pyvisa-py: 
+```
+pip install pyvisa-py
+```
+
+
 ### try to setup the Keysight in the old qcodes environment
 (without modifying any software, since the old qcodes environment is key, to take data)
 - initialization works: 
@@ -95,6 +142,20 @@ To show the Magnitude/Phase/Im/Re parts: right click trace heading -> Format -> 
 To add a window below with the phase: Instrument -> Window -> Add Window -> New Trace + Window. Then Format -> Phase. 
 
 ## taking data from the Keysight
+
+
+# installing updated qcodes version
+Both drivers (Anritsu and Keysight) give a `TypeError` in their drivers during initialization of the instrument. 
+This didn't occur in the older qcodes conda environment (which is broken). 
+
+TODO: 
+
+- backup the old qcodes version
+- backup the old pyvisa and pyvisa-py versions
+
+- copy the old pyvisa-py directory (copied from NI?, proprietary?) to the new environment and try again
+- go and debug the driver and find the root cause of the TypeError (requires a console and a text editor, one can't debug properly in spyder). 
+
 
 
 ## Qcodes config file
@@ -213,7 +274,128 @@ ing hlab
 ## conda_envs
 To roll back to working conda environments, yml files are stored here. 
 
-
-
 # reason for updating anaconda
 hlab has some functions which need a newer python version than our current qcodes/python setup. 
+
+# using pyvisa without the qcodes layer
+Some manufacturers provide in their programming manual an example of how to connect hardware to 
+the visa library (lower-level than qcodes), e.g. here for a keysight device
+```
+http://na.support.keysight.com/fieldfox/help/Programming/webhelp/Examples/Python_Example.htm
+```
+or for an anritsu vna: 
+```
+https://dl.cdn-anritsu.com/en-us/test-measurement/files/Manuals/Programming-Manual/10410-00746V.pdf#page=36
+```
+
+Each manufacturer can have it's own specific visa libraries, e.g. Keysight might have it at a path
+```
+# Open a VISA resource manager pointing to the installation folder for the Keysight Visa libraries.
+
+rm = visa.ResourceManager('C:\\Program Files (x86)\\IVI Foundation\\VISA\\WinNT\\agvisa\\agbin\\visa32.dll') 
+```
+
+but actually, the `visa32.dll` supplied by windows (`C:\\WINDOWS\\system32\\visa32.dll`) worked for me as well. 
+
+
+# debugging qcodes internals: TypeError on initialization of the keysight
+After updating qcodes to the following version,  
+```
+$ pip show qcodes
+Name: qcodes
+Version: 0.17.0+139.g11417d944
+Summary: Python-based data acquisition framework developed by the Copenhagen / Delft / Sydney / Microsoft quantum computing consortium
+Home-page: https://github.com/QCoDeS/Qcodes
+[...]
+```
+I was not able to initialize a keysight device any more (using the driver in `qcodes/instrument_drivers/Keysight/N52xx.py`), 
+since it gave me a `TypeError`, more specifically: 
+
+```
+Traceback (most recent call last):
+  File "qcodes_keysight_example.py", line 43, in <module>
+    pna = N5245A("VNA2", "TCPIP0::maip-franck::hislip0,4880::INSTR",
+  File "qcodes_keysight_example.py", line 32, in __init__
+    super().__init__(name, address,
+  File "c:\users\nanospin\misc\qcodes\qcodes\instrument_drivers\Keysight\N52xx.py", line 422, in __init__
+    trace1 = self.traces[0]
+  File "c:\users\nanospin\misc\qcodes\qcodes\instrument_drivers\Keysight\N52xx.py", line 471, in traces
+    trace_num = self.select_trace_by_name(trace_name)
+  File "c:\users\nanospin\misc\qcodes\qcodes\instrument_drivers\Keysight\N52xx.py", line 504, in select_trace_by_name
+    self.write(f"CALC:PAR:SEL '{trace_name}'")
+  File "c:\users\nanospin\misc\qcodes\qcodes\instrument\base.py", line 712, in write
+    raise e
+  File "c:\users\nanospin\misc\qcodes\qcodes\instrument\base.py", line 708, in write
+    self.write_raw(cmd)
+  File "c:\users\nanospin\misc\qcodes\qcodes\instrument\visa.py", line 212, in write_raw
+    nr_bytes_written, ret_code = self.visa_handle.write(cmd)
+TypeError: ('cannot unpack non-iterable int object', 'writing "CALC:PAR:SEL \'CH1_S11_1\'" to <N5245A: VNA2>')
+```
+
+So I tracked it down and indeed, in my case `self.visa_handle.write(cmd)` returned only an `int`, not a tuple!
+```
+> c:\users\nanospin\appdata\local\continuum\anaconda3\envs\qcodes_sandbox\lib\site-packages\pyvisa\ctwrapper\functions.py(2797)write()
+-> return return_count.value, ret
+(Pdb) ll
+2772    def write(library, session, data):
+2773        """Write data to device or interface synchronously.
+2774
+2775        Corresponds to viWrite function of the VISA library.
+2776
+2777        Parameters
+2778        ----------
+2779        library : ctypes.WinDLL or ctypes.CDLL
+2780            ctypes wrapped library.
+2781        session : VISASession
+2782            Unique logical identifier to a session.
+2783        data : bytes
+2784            Data to be written.
+2785
+2786        Returns
+2787        -------
+2788        int
+2789            Number of bytes actually transferred
+2790        constants.StatusCode
+2791            Return value of the library call.
+2792
+2793        """
+2794        return_count = ViUInt32()
+2795        # [ViSession, ViBuf, ViUInt32, ViPUInt32]
+2796        ret = library.viWrite(session, data, len(data), byref(return_count))
+2797 ->     return return_count.value, ret
+(Pdb) return_count.value
+25
+```
+I then edited `write_raw` in `qcodes/instrument/visa.py` to account for this case (and not break): 
+```
+ def write_raw(self, cmd: str) -> None:
+        """
+        Low-level interface to ``visa_handle.write``.
+
+        Args:
+            cmd: The command to send to the instrument.
+        """
+        with DelayedKeyboardInterrupt():
+            self.visa_log.debug(f"Writing: {cmd}")
+            response = self.visa_handle.write(cmd)
+            nr_bytes_written = None
+
+            if type(response) is tuple and len(response) == 2:
+                nr_bytes_written = response[0]
+                ret_code = response[1]
+                self.check_error(ret_code)
+            else:
+                nr_bytes_written = response
+```
+I minimally altered the code to circumvent this error. Now the connection to the device works again.
+
+Trying to make a pull request: 
+1. The Qcodes commit that was working was `11417d94437bf37569fc4aa144c7c2ca900411fa`. 
+(2. pull latest changes from Github.)
+3. create a fork of the current Github repo
+4. clone your fork onto your computer
+5. create a branch
+6. make the change
+
+
+

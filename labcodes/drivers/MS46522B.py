@@ -495,6 +495,7 @@ class VNABase(VisaInstrument):
         #ChannelList.__getitem__(self, 0)
         # Add shortcuts to first trace
         trace1 = self.traces[0]
+        import ipdb; ipdb.set_trace()  # noqa BREAKPOINT
         for param in trace1.parameters.values():
             self.parameters[param.name] = param
             #print(param)

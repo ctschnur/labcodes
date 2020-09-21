@@ -16,4 +16,13 @@ from plottr.node.autonode import autonode
 
 from plottr import QtGui, QtCore, Flowchart
 
+import qcodes as qc
+
+import plottr.apps.inspectr as inspectr
+
 app = QtGui.QApplication([])
+
+inspectr.inspectr(os.path.join('C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements\\Data', 'experiments.db'))
+
+
+# inspectr.

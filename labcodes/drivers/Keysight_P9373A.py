@@ -10,7 +10,9 @@ inspired by qcodes/instrument_drivers/Keysight/N5230C.py
 
 from qcodes.instrument.base import Instrument
 
-from N52xx_modified_for_Keysight_P9373A import PNABase
+# from labcodes.drivers.N52xx_modified_for_Keysight_P9373A import PNABase
+
+from qcodes.instrument_drivers.Keysight.N52xx import PNABase
 
 class Keysight_P9373A(PNABase):
     def __init__(self, name, address, 
