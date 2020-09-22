@@ -399,3 +399,11 @@ Trying to make a pull request:
 
 
 
+# Plottr 
+run the inspectr tool (for qcodes db files) 
+```
+import plottr.apps.inspectr as ir
+ir.script()
+```
+
+the same thing for monitr and for autoplot.
