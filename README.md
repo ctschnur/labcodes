@@ -401,7 +401,6 @@ As it turns out, I had a version of pyvisa installed that was too new.
 
 
 
-
 # Data-Taking Workflow for the Keysight
 Open up a text editor to `c:/Users/nanospin/misc/labcodes/labcodes/keysight/keysight_measurement.py`. 
 Make changes to setup name, parameters and database files. 
@@ -409,3 +408,13 @@ Launch a terminal and run `conda activate qcodes_sandbox`, then run `juypter qtc
 In the qtconsole, run `%run c:/Users/nanospin/misc/labcodes/labcodes/keysight/keysight_measurement.py`, 
 which will always reload the changes made to that file. Sometimes, the `autoreload` magic doesn't work I have found
 and in this case, I switch to just `%run`. 
+
+
+# Plottr 
+run the inspectr tool (for qcodes db files) 
+```
+import plottr.apps.inspectr as ir
+ir.script()
+```
+
+the same thing for monitr and for autoplot.
