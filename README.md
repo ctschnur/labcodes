@@ -141,8 +141,6 @@ Right-click on the trace's heading and select the desired S-Matrix element (S11 
 To show the Magnitude/Phase/Im/Re parts: right click trace heading -> Format -> [x]. 
 To add a window below with the phase: Instrument -> Window -> Add Window -> New Trace + Window. Then Format -> Phase. 
 
-## taking data from the Keysight
-
 
 # installing updated qcodes version
 Both drivers (Anritsu and Keysight) give a `TypeError` in their drivers during initialization of the instrument. 
@@ -395,7 +393,19 @@ Trying to make a pull request:
 3. create a fork of the current Github repo
 4. clone your fork onto your computer
 5. create a branch
-6. make the change
+6. make the change (respect coding guidelines)
+7. on github, press the pull request button and comment on why the change should be made
+
+
+As it turns out, I had a version of pyvisa installed that was too new. 
 
 
 
+
+# Data-Taking Workflow for the Keysight
+Open up a text editor to `c:/Users/nanospin/misc/labcodes/labcodes/keysight/keysight_measurement.py`. 
+Make changes to setup name, parameters and database files. 
+Launch a terminal and run `conda activate qcodes_sandbox`, then run `juypter qtconsole`. 
+In the qtconsole, run `%run c:/Users/nanospin/misc/labcodes/labcodes/keysight/keysight_measurement.py`, 
+which will always reload the changes made to that file. Sometimes, the `autoreload` magic doesn't work I have found
+and in this case, I switch to just `%run`. 
