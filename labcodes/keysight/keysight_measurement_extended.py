@@ -26,7 +26,7 @@ class KeysightMeasurement:
             3. specify paths of the target files: 
                database file and a new folder with raw (txt, png) files """
 
-        # import pdb; pdb.set_trace()  # noqa BREAKPOINT
+        import pdb; pdb.set_trace()  # noqa BREAKPOINT
 
         self.vna_name = 'VNA_Keysight'
         # this is a qcodes VisaInstrument (interface between visa and qcodes)
@@ -42,8 +42,6 @@ class KeysightMeasurement:
         else:
             self.vna = self.vna_class(self.vna_name, self.vna_address,
                                       300e3, 13.5e9, -90, 13, 2)
-
-
         
         # -- name the experiment -> automatic file names
         self.exp_name = 'test_exp'  # name used by qcodes
@@ -75,12 +73,27 @@ class KeysightMeasurement:
         self.create_database_experiment_and_folders()
 
         self.ask_what_to_do()
+        
 
-    def take_screen_chris_keysight(self):
-        """ takes a frequency sweep, not setting any values on the hardware """
+    def record_S21_sweep_frequency(self, use_default_values=False, override_default_values=False, **kwargs):
+        """ takes a frequency sweep, keeping all parameters the same 
+            (getting them from the instrument) except for specific ones 
+            set in kwargs, which are set in the instrument before performing 
+            the sweep. """
+
+        for key, value in kwargs.items():
+            # check if the qcodes driver has this parameter
+            self.vna.
+            self.driver_exposed_parameters = __dict__.update(kwargs)
         
+        self.vna.power(self.vnapower)
+        self.vna.start(self.start_frequency)
+        self.vna.stop(self.stop_frequency)
+        self.vna.points(self.num_freq_points)
+        self.vna.trace(self.measuredtrace)
         
-        # import pdb; pdb.set_trace()
+        # num_freq_points = self.vna.points.get()  # get current number of points from VNA settings
+
         meas = Measurement()  # qcodes measurement
 
         # self.vna.points.set(20)
@@ -94,8 +107,8 @@ class KeysightMeasurement:
 
         # actually get the data
         with meas.run() as datasaver:  # try to run the measurement (? but this doesn't yet write to the database)
-            self.vna.active_trace.set(1)  # there are Tr1 and Tr2
-            # self.vna.traces.tr1.run_sweep()
+            # self.vna.active_trace.set(1)  # there are Tr1 and Tr2
+            self.vna.traces.tr1.run_sweep()
 
             imag = self.vna.imaginary()
             real = self.vna.real()
@@ -113,6 +126,39 @@ class KeysightMeasurement:
         pd = datasaver.dataset.get_parameter_data()
 
         plot_by_id(dataid)
+
+        export = np.zeros((self.num_freq_points, 5))
+
+        export[:, 0] = pd[self.vna_name +
+                         "_tr1_magnitude"][self.vna_name + '_tr1_frequency'][0]
+        export[:, 1] = pd[self.vna_name +
+                         '_tr1_magnitude'][self.vna_name + '_tr1_magnitude'][0]
+        export[:, 2] = pd[self.vna_name +
+                         '_tr1_phase'][self.vna_name + '_tr1_phase'][0]
+        export[:, 3] = pd[self.vna_name +
+                         '_tr1_real'][self.vna_name + '_tr1_real'][0]
+        export[:, 4] = pd[self.vna_name +
+                         '_tr1_imaginary'][self.vna_name + '_tr1_imaginary'][0]
+
+        np.savetxt(os.path.join(self.raw_path_with_date,
+                                str(datasaver.run_id)+'_nosweep' +
+                                '_'+str(self.exp_name)+'.txt'),
+                   export)
+
+        plt.plot(export[:, 0], export[:, 1])
+        plt.xlabel('Frequency (Hz)')
+        plt.ylabel('Magnitude (dB)')
+        plt.savefig(os.path.join(self.raw_path_with_date,
+                                 str(datasaver.run_id)+'_nosweep' +
+                                 '_'+str(self.exp_name)+'_magnitude.png'))
+
+        plt.cla()
+        plt.plot(export[:, 0], export[:, 2])
+        plt.xlabel('Frequency (Hz)')
+        plt.ylabel('Phase (deg)')
+        plt.savefig(os.path.join(self.raw_path_with_date,
+                                 str(datasaver.run_id)+'_nosweep' +
+                                 '_'+str(self.exp_name)+'_phase.png'))
 
     def record_S21_sweep_power_sweep_frequency(self):
         # -- setting vna parameters
@@ -218,11 +264,11 @@ class KeysightMeasurement:
     def ask_what_to_do(self):
         print("self.vna.power.get(): ", self.vna.power.get())
         program_part = int(input(
-            "Choose your sequence: \n  1. take_screen_chris_keysight \n  2. record S21, sweep power and frequency\n"))
+            "Choose your sequence: \n  1. record S21, sweep frequency\n  2. record S21, sweep power and frequency\n"))
         time.sleep(1)
 
         if program_part == 1:
-            self.take_screen_chris_keysight()
+            self.record_S21_sweep_frequency()
         elif program_part == 2:
             self.record_S21_sweep_power_sweep_frequency()
         else:
@@ -233,28 +279,22 @@ class KeysightMeasurement:
         print("self.vna.power.get(): ", self.vna.power.get())
         print("self.vna.points.get(): ", self.vna.points.get())
 
+        self.vna.sweep_mode.set('CONT')
+
     def create_database_experiment_and_folders(self):
         # -- set the path where the raw data should be saved to (pngs, txts)
-        # self.raw_path = ('C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements\\chris\\keysight_tests_data' +
-        #                  '\\' + self.cooldown_date + '_' + self.sample_name + '\\'
-        #                  'raw')
+        self.raw_path = ('C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements\\chris\\keysight_tests_data' +
+                         '\\' + self.cooldown_date + '_' + self.sample_name + '\\'
+                         'raw')
 
-        # # set the .db path
-        # qc.config["core"]["db_location"] = (
-        #     os.path.join('C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements\\chris\\keysight_tests_data',
-        #     'keysight_tests.db'))
-
-        # # store a qcodesrc file with the loaded .db path to the measurements folder
-        # qc.config.save_config(
-        #     os.path.join("C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements", ".qcodesrc"))
-        
         # set the .db path
         qc.config["core"]["db_location"] = (
-            os.path.join('C:\\Users\\nanospin\\Desktop\\test.db'))
+            os.path.join('C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements\\chris\\keysight_tests_data',
+            'keysight_tests.db'))
 
-        # # store a qcodesrc file with the loaded .db path to the measurements folder
-        # qc.config.save_config(
-        #     os.path.join("C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements", ".qcodesrc"))
+        # store a qcodesrc file with the loaded .db path to the measurements folder
+        qc.config.save_config(
+            os.path.join("C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements", ".qcodesrc"))
 
         # self.raw_path = 'C:\\Users\\nanospin\\Nextcloud\\Lab-Shared\\measurements\\Data\\'+self.cooldown_date+'_'+self.sample_name+"\\raw\\"
 
@@ -278,18 +318,17 @@ class KeysightMeasurement:
             print('Starting new experiment.')
             self.exp = new_experiment(self.exp_name, self.sample_name)
 
-            # os.makedirs(self.raw_path, exist_ok=True)
+            os.makedirs(self.raw_path, exist_ok=True)
 
-        # # ---- always create a new folder for each day of taking measurements
-        # self.raw_path_with_date = os.path.join(
-        #     self.raw_path, date.today().strftime("%y-%m-%d"))
+        # ---- always create a new folder for each day of taking measurements
+        self.raw_path_with_date = os.path.join(
+            self.raw_path, date.today().strftime("%y-%m-%d"))
 
-        # if not os.path.isdir(self.raw_path_with_date):
-        #     # force-create the directory
-        #     os.makedirs(self.raw_path_with_date, exist_ok=True)
+        if not os.path.isdir(self.raw_path_with_date):
+            # force-create the directory
+            os.makedirs(self.raw_path_with_date, exist_ok=True)
 
 if __name__ == '__main__':
     m = KeysightMeasurement()
 
     print("m created")
-    # m.record_vna_screen()

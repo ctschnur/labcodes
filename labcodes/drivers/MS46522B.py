@@ -161,6 +161,7 @@ class VNATrace(InstrumentChannel):
         # Note: Currently parameters that return complex values are not
         # supported as there isn't really a good way of saving them into the
         # dataset
+        print("parameters loaded")
         self.add_parameter('Formatoutput',
                            label='Format of Output',
                            get_cmd="FORM:DATA?",
@@ -495,7 +496,7 @@ class VNABase(VisaInstrument):
         #ChannelList.__getitem__(self, 0)
         # Add shortcuts to first trace
         trace1 = self.traces[0]
-        import ipdb; ipdb.set_trace()  # noqa BREAKPOINT
+        
         for param in trace1.parameters.values():
             self.parameters[param.name] = param
             #print(param)
