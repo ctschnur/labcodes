@@ -110,6 +110,8 @@ class AnritsuMeasurement:
         # smatrix_elem_str = Parameter("smatrix_elem", self.vna)
         
         traces = self.vna.traces
+
+        import pdb; pdb.set_trace()  # noqa BREAKPOINT
         
         for trace in traces:
             meas.register_parameter(trace.trace, paramtype="text")  # this is actually the label "S11, S12, ..." of the trace

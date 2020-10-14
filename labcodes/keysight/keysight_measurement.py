@@ -42,8 +42,6 @@ class KeysightMeasurement:
         else:
             self.vna = self.vna_class(self.vna_name, self.vna_address,
                                       300e3, 13.5e9, -90, 13, 2)
-
-
         
         # -- name the experiment -> automatic file names
         self.exp_name = 'test_exp'  # name used by qcodes
@@ -71,17 +69,20 @@ class KeysightMeasurement:
         # vna.groupdelay.set(groupdelayref)#resets to 0 instead of working -> rounding to 0
         # print(vna.groupdelay.get())
 
-
         self.create_database_experiment_and_folders()
 
-        self.ask_what_to_do()
+        # self.choose_sequence()
 
-    def take_screen_chris_keysight(self):
+    def take_buffer_keysight(self):
         """ takes a frequency sweep, not setting any values on the hardware """
-        
-        
+
+        from qcodes import Station
+
+        station = Station()
+        station.add_component(self.vna)
+
         # import pdb; pdb.set_trace()
-        meas = Measurement()  # qcodes measurement
+        meas = Measurement(station=station)  # qcodes measurement
 
         # self.vna.points.set(20)
         self.vna.auto_sweep(False)
@@ -111,6 +112,7 @@ class KeysightMeasurement:
             dataid = datasaver.run_id
 
         pd = datasaver.dataset.get_parameter_data()
+        snapshot = datasaver.dataset.snapshot
 
         plot_by_id(dataid)
 
@@ -215,14 +217,14 @@ class KeysightMeasurement:
                                 '_'+str(self.exp_name)+'_imaginary.txt'),
                    imaginary_table)
 
-    def ask_what_to_do(self):
+    def choose_sequence(self):
         print("self.vna.power.get(): ", self.vna.power.get())
         program_part = int(input(
-            "Choose your sequence: \n  1. take_screen_chris_keysight \n  2. record S21, sweep power and frequency\n"))
+            "Choose a sequence: \n  1. take_buffer_keysight \n  2. record S21, sweep power and frequency\n"))
         time.sleep(1)
 
         if program_part == 1:
-            self.take_screen_chris_keysight()
+            self.take_buffer_keysight()
         elif program_part == 2:
             self.record_S21_sweep_power_sweep_frequency()
         else:

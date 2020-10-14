@@ -6,9 +6,9 @@ The data-taking computer runs windows 10.
 # Sets of software tools
 1. A setup *everyone* should be able to use: 
   - Spyder for editing measurement scripts and navigating code
-  - Juyter Notebooks (or jupyter qtconsole REPL) for running the commands to take data
+  <!-- - Juyter Notebooks (or jupyter qtconsole REPL) for running the commands to take data -->
+  - jupyter console repl (with autocomplete) and activated conda environment from anaconda powershell prompt. 
   - plottr (inspectr) to view the incoming data directly after the data has been written to the database. 
-  
   
   Workflow: 
   1. Make a folder where raw data (`.txt` and `.png`) of each measurement call is stored, in addition to the jupyter notebooks (`.ipynb`) file and possibly other quick data-analysis files; folder should be labelled by date
@@ -79,6 +79,20 @@ qc.config
 There might even be a list of many `qcodesrc.json` files in several locations. 
 If two of them have an entry for e.g. `db_location`, the file occuring first 
 in the list will be prevalent. 
+
+#### snapshots
+A snapshot is a json data structure stored alongside the data of a measurement run. To save a snapshot, just add a `Station` and your instruments and outside parameters using `add_component`. Then, add the station to the measurement. 
+```
++
++        from qcodes import Station
++
++        station = Station()
++        station.add_component(self.vna)
++
+         # import pdb; pdb.set_trace()
+-        meas = Measurement()  # qcodes measurement
+```
+The snapshot will be able to be seen from inside plottr inspectr. 
 
 ## Plottr
 ### inspectr
@@ -422,3 +436,5 @@ In the qtconsole, run `%run c:/Users/nanospin/misc/labcodes/labcodes/keysight/ke
 which will always reload the changes made to that file. Sometimes, the `autoreload` magic doesn't work I have found
 and in this case, I switch to just `%run`. 
 
+## jupyter console prints characters multiple times in the cmd -> unusable
+Solution: just use the anaconda prompt (or even better: the anaconda powershell) instead of the normal cmd. It even comes with autocompletion in the jupyter session!
