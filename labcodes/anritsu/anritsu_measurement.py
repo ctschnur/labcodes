@@ -99,8 +99,10 @@ class AnritsuMeasurement:
         exit(1)
         
 
-    def take_screen_anritsu_four_traces(self):   
+    def take_screen_anritsu_all_traces(self):
         # self.vna.active_trace.set(False)  # is this needed at all?
+
+        # t1.trace.set("S22")
     
         meas = Measurement()  # qcodes measurement
         
@@ -108,20 +110,22 @@ class AnritsuMeasurement:
 
         # from qcodes import Parameter
         # smatrix_elem_str = Parameter("smatrix_elem", self.vna)
+
+        # import pdb; pdb.set_trace()  # noqa BREAKPOINT
         
         traces = self.vna.traces
 
-        import pdb; pdb.set_trace()  # noqa BREAKPOINT
+        # import pdb; pdb.set_trace()  # noqa BREAKPOINT
         
         for trace in traces:
-            meas.register_parameter(trace.trace, paramtype="text")  # this is actually the label "S11, S12, ..." of the trace
+            meas.register_parameter(trace.trace_parameter, paramtype="text")  # this is actually the label "S11, S12, ..." of the trace
             
             meas.register_parameter(trace.real)
             meas.register_parameter(trace.imaginary)
         
             meas.register_parameter(trace.magnitude)
             meas.register_parameter(trace.phase)
-        
+
         # actually get the data
         with meas.run() as datasaver:  # try to run the measurement (? but this doesn't yet write to the database)
         
@@ -129,25 +133,21 @@ class AnritsuMeasurement:
             for trace in traces:
                 # self.vna.active_trace.set(n)  # there may be even 4 traces (S-matrix elements)
                 # self.vna.traces.tr1.run_sweep()
-                
                 # smatrix_elem = self.vna.smatrix_elem()
-                
-                tr = trace.trace()
+                tp = trace.trace_parameter()
                 
                 imag = trace.imaginary()
                 real = trace.real()
         
                 mag = trace.magnitude()
                 phase = trace.phase()
-                
-                data.append((trace.trace, tr))
+
+                data.append((trace.trace_parameter, tp))
                 data.append((trace.imaginary, imag))
                 data.append((trace.real, real))
                 data.append((trace.magnitude, mag))
                 data.append((trace.phase, phase))
-            
-            # import pdb; pdb.set_trace()
-            
+
             datasaver.add_result(*data)
             dataid = datasaver.run_id
 

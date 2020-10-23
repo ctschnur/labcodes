@@ -152,6 +152,21 @@ class VNATrace(InstrumentChannel):
         self.trace_name = trace_name
         self.trace_num = trace_num
 
+        def get_S_param_on_this_trace():
+            return parent.ask(":CALC1:PAR" + str(self.trace_num) + ":DEF?")
+
+        def set_S_param_on_this_trace(S_param : str):
+            """
+            Args:
+                S_param: either 'S11', 'S12', 'S21' or 'S22' """
+            return parent.write(":CALC1:PAR" + str(self.trace_num) + ":DEF " + S_param)
+
+        self.add_parameter('trace_parameter',
+                           label='Trace_parameter',
+                           get_cmd=get_S_param_on_this_trace, #':CALC1:PAR{}:DEF?' # ,
+                           set_cmd=set_S_param_on_this_trace  # ':CALC1:PAR:DEF {}'
+                           )
+
         # Name of parameter (i.e. S11, S21 ...)
         self.add_parameter('trace',
                            label='Trace',
@@ -161,7 +176,7 @@ class VNATrace(InstrumentChannel):
         # Note: Currently parameters that return complex values are not
         # supported as there isn't really a good way of saving them into the
         # dataset
-        print("parameters loaded")
+        # print("parameters loaded")
         self.add_parameter('Formatoutput',
                            label='Format of Output',
                            get_cmd="FORM:DATA?",
@@ -545,35 +560,30 @@ class VNABase(VisaInstrument):
         """
         # Keep track of which trace was active before. This command may fail
         # if no traces were selected.
-        """
-        try:
-            active_trace = self.active_trace()
-        except VisaIOError as e:
-            if e.error_code == errors.StatusCode.error_timeout:
-                active_trace = None
-            else:
-                raise
-        """
+
+
+        # try:
+        #     active_trace = self.active_trace()
+        # except VisaIOError as e:
+        #     if e.error_code == errors.StatusCode.error_timeout:
+        #         active_trace = None
+        #     else:
+        #         raise
+
 
         # Get a list of traces from the instrument and fill in the traces list
-        parlist = self.Number_Traces.get()
-        #print(parlist)
-        #self_traces.clear() may cause problems when channellist empty
+        num_of_traces = self.Number_Traces.get()
+        # self_traces.clear() may cause problems when channellist empty
         self._traces.clear()
-        for trace_num in range(1,parlist+1):
-            trace_name = str(trace_num)
-            #print(trace_name)
+        for trace_num in range(1, num_of_traces + 1):
             vna_trace = VNATrace(self, "tr{}".format(trace_num),
-                                 trace_name, trace_num)
-            #print(vna_trace)
+                                 str(trace_num), trace_num)
             self._traces.append(vna_trace)
-        #print(self._traces)
 
-        # Restore the active trace if there was one
-        """
-        if active_trace:
-            self.active_trace(active_trace)
-        """
+        # # Restore the active trace if there was one
+        # if active_trace:
+        #     self.active_trace(active_trace)
+
 
         # Return the list of traces on the instrument
         return self._traces

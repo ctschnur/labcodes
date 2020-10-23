@@ -9,5 +9,8 @@ def print_version_report(path):
 
     print("Git root: ", git_root)
     print("last commit: ", time.asctime(time.localtime(git_repo.head.commit.committed_date)), ", ", git_repo.head.commit.hexsha)
+    print("message: ", git_repo.head.commit.message)
 
-print("Version report: ", __file__)
+
+
+print_version_report(__file__)

@@ -20,6 +20,9 @@ The data-taking computer runs windows 10.
   - [ ] Juyter Notebooks (server called from within emacs, with selectable virtual environment)
   - [ ] plottr (inspectr) called from within emacs
   - [ ] snapshotting the measurement run (i.e. generate a snapshot string and print it in jupyter (containing hardware settings (qcodes station) and commit hash of the script +indicator if it has been modified after the commit, +info about the python virtual environment (versions of installed packages)))
+  
+## bootstrapping
+It would be convenient to have a folder on the desktop containing executable files for e.g. running plottr. This folder can be created by running 
 
 ## Spyder
 It should come pre-installed with each conda environment. If not, install it from the conda repos into the environment, not just using pip. Using 
