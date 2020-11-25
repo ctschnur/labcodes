@@ -1,29 +1,31 @@
 Notes on data-taking tools, hardware and troubleshooting them in VNA+Fridge experiments. 
-
-
 The data-taking computer runs windows 10. 
 
-# Sets of software tools
-1. A setup *everyone* should be able to use: 
-  - Spyder for editing measurement scripts and navigating code
-  <!-- - Juyter Notebooks (or jupyter qtconsole REPL) for running the commands to take data -->
-  - jupyter console repl (with autocomplete) and activated conda environment from anaconda powershell prompt. 
-  - plottr (inspectr) to view the incoming data directly after the data has been written to the database. 
+# Monitoring measurements
+1. Open an instance of Spyder for editing measurement scripts and navigating code: 
+  open up an anaconda powershell prompt and type
+  ```
+  conda activate qcodes_sandbox
+  spyder --new-instance
+  ```
   
-  Workflow: 
-  1. Make a folder where raw data (`.txt` and `.png`) of each measurement call is stored, in addition to the jupyter notebooks (`.ipynb`) file and possibly other quick data-analysis files; folder should be labelled by date
-  2. Open a terminal, activate the desired python virutal environment (e.g. `qcodes_sandbox`) using `conda activate qcodes_sandbox` and start juypter notebook 
-  3. Debugging of python code: in a terminal, run `python` and then sequentially run the commands that produce an error. Then, go to where the error occured and insert a breakpoint `import ipdb; ipdb.set_trace();`. Then, run the command again and step through the code with `n`, `s` or `c`. 
-
-2. A setup that *hackers* could use (if it works) and can keep streamlining
-  - Emacs as a general editing environment and for navigating code (lsp, c/g/etags)
-  - [ ] Juyter Notebooks (server called from within emacs, with selectable virtual environment)
-  - [ ] plottr (inspectr) called from within emacs
-  - [ ] snapshotting the measurement run (i.e. generate a snapshot string and print it in jupyter (containing hardware settings (qcodes station) and commit hash of the script +indicator if it has been modified after the commit, +info about the python virtual environment (versions of installed packages)))
+2. Open an instance of plottr (inspectr) to plot the data arriving in the database: 
+  open up an anaconda powershell prompt and type
+  ```
+  conda activate qcodes_sandbox
+  plottr-inspectr
+  ```
+  then select the database file you want to monitor
   
-## bootstrapping
-It would be convenient to have a folder on the desktop containing executable files for e.g. running plottr. This folder can be created by running 
-
+3. Open an instance of a jupyter-console REPL (or just a python repl): 
+  open up an anaconda powershell prompt and type
+  ```
+  conda activate qcodes_sandbox
+  jupyter-console
+  ```
+  then, type the commands for taking data, implemented in the measurement scripts. If the measurement scripts change, restart jupyter-console. 
+  Anaconda powershell prompt allows autocompletion. Start by typing `import labcodes.` and press `TAB`. 
+  
 ## Spyder
 It should come pre-installed with each conda environment. If not, install it from the conda repos into the environment, not just using pip. Using 
 `pip install spyder` resulted in an installation where 
@@ -180,7 +182,7 @@ and the one marked with the astrisk is the current one.
 - Preliminary knowledge
   The core functions that would be useful are: 
   - do1d, do2d, ...
-  they run a set of sweeps, characterized by a set of parameters 
+  they run a set of sweeps, characterized by a set of parameters
 
 A good-enough workflow would enable the following:
 Make a text file with unique names for measurement routines; specify only the 

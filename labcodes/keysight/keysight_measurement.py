@@ -49,7 +49,7 @@ class KeysightMeasurement:
         self.sample_name = 'test_sample'
 
         # -- set experiment parameters (global constants, used in different measurement functions)
-        self.num_freq_points = 2001  # 2001  # number of measurement points
+        self.num_freq_points = 200  # 2001  # number of measurement points
         self.vnapower = -30  # applied power
         # 3.7e9  #3.387015e9 #6.608e9-3.5e6  # start frequency of sweep
         self.start_frequency = 3e9
@@ -126,6 +126,14 @@ class KeysightMeasurement:
         self.vna.if_bandwidth.set(self.ifbandwidth)
         self.vna.trace.set(self.measuredtrace)
         self.vna.auto_sweep.set(False)
+        
+        from qcodes import Station
+
+        station = Station()
+        station.add_component(self.vna)
+
+        # import pdb; pdb.set_trace()
+        meas = Measurement(station=station)  # qcodes measurement
 
         # vna.groupdelay.set(groupdelayref) #does not work yet
         meas = Measurement()
@@ -273,6 +281,7 @@ class KeysightMeasurement:
                 self.exp_name, sample=self.sample_name)
             # keep track of the experiment number
             print('Experiment loaded. Last ID no: ', self.exp.last_counter)
+            print('Database: ', qc.config["core"]["db_location"])
         except ValueError:
             print("Experiment name `", self.exp_name, "` with sample name `", self.sample_name, "` not found in ",
                   qc.config["core"]["db_location"])
